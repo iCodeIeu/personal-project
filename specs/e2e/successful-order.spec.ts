@@ -1,18 +1,27 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../fixtures/fixtures';
+import helpers, { testSorting } from '../../pages/helpers.page';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test.describe('E2E - Successful purchase', () => {
+  const standardUser = 'standard_user';
+  const password = 'secret_sauce';
+  test.beforeEach(async ({ page, login }) => {
+    await page.goto('/');
+    await expect(login.usernameField).toBeVisible();
+  });
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+  test('Verify the core functionalites of the purchase flow', { tag: ['@e2ePurchase'] }, async ({ login, products, page }) => {
+    await test.step('Should check the ability to login', async () => {
+      await login.usernameField.fill(standardUser);
+      await login.passwordField.fill(password);
+      await login.loginButton.click();
+      await expect(products.header).toBeVisible();
+      await expect(page).toHaveURL('/inventory.html');
+    });
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+    await test.step('Should check the ability to sort ', async () => {
+      const productOptions = ['az', 'za', 'hilo', 'lohi'];
+      const randomNumber = await helpers.generateRandomNumber(0, 3);
+      await testSorting(page, productOptions[randomNumber]);
+    });
+  });
 });
