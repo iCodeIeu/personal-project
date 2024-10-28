@@ -1,0 +1,9 @@
+# dependencies
+/node_modules
+
+#testing
+
+/playwright.config.ts
+/playwright-report/
+/test-results/
+/playwright/.cache/

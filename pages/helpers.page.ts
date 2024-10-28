@@ -1,11 +1,37 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { Products } from './products.page';
+import { Cart } from './cart.page';
+import { YourInfo, Overview } from './checkout.page';
 
 export class Helpers {
   async generateRandomNumber(min: number, max: number): Promise<number> {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  async completeSuccessfulPurchase(
+    productNumber: number & { max: 6 },
+    page: Page,
+    firstName?: string,
+    lastName?: string,
+    postcode?: string
+  ) {
+    const products = new Products(page);
+    const cart = new Cart(page);
+    const yourInfo = new YourInfo(page);
+    const overview = new Overview(page);
+    const addButtons = page.$$(products.addItemtoCart.toString());
+    for (let i = 0; i < productNumber; i++) {
+      await addButtons[i].click();
+    }
+    await expect(products.shoppingCartItemCounter).toHaveText(String(productNumber));
+    await products.shoppingCartLink.click();
+    await expect(cart.header).toHaveText('Your Cart', { ignoreCase: true });
+    await expect(cart.GenericInventory().listItem).toHaveCount(productNumber);
+    await cart.checkoutButton.click();
+    await yourInfo.firstNameInput.fill(firstName ?? '');
+    await yourInfo.lastNameInput.fill(lastName ?? '');
   }
 }
 

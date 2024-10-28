@@ -1,11 +1,13 @@
 import { test as base } from '@playwright/test';
 import { Login } from '../pages/login.page';
 import { Products } from '../pages/products.page';
+import { Cart } from '../pages/cart.page';
 import { YourInfo, Overview } from '../pages/checkout.page';
 
 type Fixtures = {
   login: Login;
   products: Products;
+  cart: Cart;
   yourInfo: YourInfo;
   overview: Overview;
 };
@@ -19,6 +21,11 @@ export const test = base.extend<Fixtures>({
   products: async ({ page }, use) => {
     const products = new Products(page);
     await use(products);
+  },
+
+  cart: async ({ page }, use) => {
+    const cart = new Cart(page);
+    await use(cart);
   },
 
   yourInfo: async ({ page }, use) => {
