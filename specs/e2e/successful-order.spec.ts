@@ -1,18 +1,74 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../fixtures/fixtures';
+import helpers, { testSorting } from '../../pages/helpers.page';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test.describe('E2E - Successful purchase', () => {
+  const standardUser = 'standard_user';
+  const password = 'secret_sauce';
+  test.beforeEach(async ({ page, login }) => {
+    await page.goto('/');
+    await expect(login.usernameField).toBeVisible();
+    await login.usernameField.fill(standardUser);
+    await login.passwordField.fill(password);
+    await login.loginButton.click();
+  });
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+  test('Should check the ability to login successfully', { tag: ['@login'] }, async ({ products, page }) => {
+    await expect(products.GenericInventory().header).toHaveText('Products', { ignoreCase: true });
+    await expect(page).toHaveURL('/inventory.html');
+  });
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+  test('Should check the ability to sort', { tag: ['@sorting'] }, async ({ page }) => {
+    const productOptions = ['az', 'za', 'hilo', 'lohi'];
+    const randomNumber = await helpers.generateRandomNumber(0, 3);
+    await testSorting(page, productOptions[randomNumber]);
+  });
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
+  test('Should check the ability to add/remove products', { tag: ['@addRemove'] }, async ({ products }) => {
+    for (const i of [
+      products.GenericInventory().addItem1,
+      products.GenericInventory().addItem2,
+      products.GenericInventory().addItem3,
+      products.GenericInventory().addItem4,
+      products.GenericInventory().addItem5,
+      products.GenericInventory().addItem6,
+    ]) {
+      await i.click();
+    }
+    await expect(products.GenericInventory().shoppingCartItemCounter).toHaveText('6');
 
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+    for (const i of [
+      products.GenericInventory().removeItem1,
+      products.GenericInventory().removeItem2,
+      products.GenericInventory().removeItem3,
+      products.GenericInventory().removeItem4,
+      products.GenericInventory().removeItem5,
+      products.GenericInventory().removeItem6,
+    ]) {
+      await i.click();
+    }
+    await expect(products.GenericInventory().shoppingCartItemCounter).toBeHidden();
+  });
+
+  test('Should check the calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {
+    await helpers.completeSuccessfulPurchase(6, false, page);
+    const subtotal = await helpers.getDigits(overview.subtotal);
+    const priceElements = await page.$$('[data-test=inventory-item-price]');
+    const prices = await Promise.all(
+      priceElements.map(async element => {
+        const priceText = (await element.textContent()) ?? '';
+        return parseFloat(priceText.replace('$', ''));
+      })
+    );
+    const arrayTotal = prices.reduce((acc, price) => acc + price, 0);
+    await expect(arrayTotal).toEqual(subtotal);
+
+    const tax = await helpers.getDigits(overview.tax);
+    const total = await helpers.getDigits(overview.total);
+    await expect(subtotal + tax).toEqual(total);
+  });
+
+  test('Should check we can purchase products successfully', { tag: ['@e2e'] }, async ({ page, completion }) => {
+    await helpers.completeSuccessfulPurchase(6, true, page);
+    await expect(completion.checkoutComplete).toBeVisible();
+  });
 });
