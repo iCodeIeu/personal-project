@@ -7,40 +7,68 @@ test.describe('E2E - Successful purchase', () => {
   test.beforeEach(async ({ page, login }) => {
     await page.goto('/');
     await expect(login.usernameField).toBeVisible();
+    await login.usernameField.fill(standardUser);
+    await login.passwordField.fill(password);
+    await login.loginButton.click();
   });
 
-  test('Verify the core functionalites of the product purchase flow', { tag: ['@e2ePurchase'] }, async ({ login, products, page }) => {
-    await test.step('Should check the ability to login', async () => {
-      await login.usernameField.fill(standardUser);
-      await login.passwordField.fill(password);
-      await login.loginButton.click();
-      await expect(products.header).toBeVisible();
-      await expect(page).toHaveURL('/inventory.html');
-    });
+  test('Should check the ability to login successfully', { tag: ['@login'] }, async ({ products, page }) => {
+    await expect(products.GenericInventory().header).toHaveText('Products', { ignoreCase: true });
+    await expect(page).toHaveURL('/inventory.html');
+  });
 
-    await test.step('Should check the ability to sort ', async () => {
-      const productOptions = ['az', 'za', 'hilo', 'lohi'];
-      const randomNumber = await helpers.generateRandomNumber(0, 3);
-      await testSorting(page, productOptions[randomNumber]);
-    });
+  test('Should check the ability to sort', { tag: ['@sorting'] }, async ({ page }) => {
+    const productOptions = ['az', 'za', 'hilo', 'lohi'];
+    const randomNumber = await helpers.generateRandomNumber(0, 3);
+    await testSorting(page, productOptions[randomNumber]);
+  });
 
-    await test.step('Should check the ability to add/remove products', async () => {
-      const addButtons = await products.addItemtoCart.all();
-      const removeButtons = await products.removeItemFromCart.all();
+  test('Should check the ability to add/remove products', { tag: ['@addRemove'] }, async ({ products }) => {
+    for (const i of [
+      products.GenericInventory().addItem1,
+      products.GenericInventory().addItem2,
+      products.GenericInventory().addItem3,
+      products.GenericInventory().addItem4,
+      products.GenericInventory().addItem5,
+      products.GenericInventory().addItem6,
+    ]) {
+      await i.click();
+    }
+    await expect(products.GenericInventory().shoppingCartItemCounter).toHaveText('6');
 
-      for (const button of addButtons) {
-        await button.click();
-      }
-      await expect(products.GenericInventory().shoppingCartItemCounter).toHaveText('6');
+    for (const i of [
+      products.GenericInventory().removeItem1,
+      products.GenericInventory().removeItem2,
+      products.GenericInventory().removeItem3,
+      products.GenericInventory().removeItem4,
+      products.GenericInventory().removeItem5,
+      products.GenericInventory().removeItem6,
+    ]) {
+      await i.click();
+    }
+    await expect(products.GenericInventory().shoppingCartItemCounter).toBeHidden();
+  });
 
-      for (const button of removeButtons) {
-        await button.click();
-      }
-      await expect(products.GenericInventory().shoppingCartItemCounter).toBeHidden();
-    });
+  test('Should check the calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {
+    await helpers.completeSuccessfulPurchase(6, false, page);
+    const subtotal = await helpers.getDigits(overview.subtotal);
+    const priceElements = await page.$$('[data-test=inventory-item-price]');
+    const prices = await Promise.all(
+      priceElements.map(async element => {
+        const priceText = (await element.textContent()) ?? '';
+        return parseFloat(priceText.replace('$', ''));
+      })
+    );
+    const arrayTotal = prices.reduce((acc, price) => acc + price, 0);
+    await expect(arrayTotal).toEqual(subtotal);
 
-    await test.step('Should check the calculations are correct', async () => {});
+    const tax = await helpers.getDigits(overview.tax);
+    const total = await helpers.getDigits(overview.total);
+    await expect(subtotal + tax).toEqual(total);
+  });
 
-    await test.step('Should check we can purchase products successfully', async () => {});
+  test('Should check we can purchase products successfully', { tag: ['@e2e'] }, async ({ page, completion }) => {
+    await helpers.completeSuccessfulPurchase(6, true, page);
+    await expect(completion.checkoutComplete).toBeVisible();
   });
 });

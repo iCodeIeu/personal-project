@@ -2,7 +2,7 @@ import { test as base } from '@playwright/test';
 import { Login } from '../pages/login.page';
 import { Products } from '../pages/products.page';
 import { Cart } from '../pages/cart.page';
-import { YourInfo, Overview } from '../pages/checkout.page';
+import { YourInfo, Overview, Completion } from '../pages/checkout.page';
 
 type Fixtures = {
   login: Login;
@@ -10,6 +10,7 @@ type Fixtures = {
   cart: Cart;
   yourInfo: YourInfo;
   overview: Overview;
+  completion: Completion;
 };
 
 export const test = base.extend<Fixtures>({
@@ -36,6 +37,11 @@ export const test = base.extend<Fixtures>({
   overview: async ({ page }, use) => {
     const overview = new Overview(page);
     await use(overview);
+  },
+
+  completion: async ({ page }, use) => {
+    const completion = new Completion(page);
+    await use(completion);
   },
 });
 

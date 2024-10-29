@@ -1,9 +1,14 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { Products } from './products.page';
 import { Cart } from './cart.page';
-import { YourInfo, Overview } from './checkout.page';
+import { YourInfo, Overview, Completion } from './checkout.page';
+import { faker } from '@faker-js/faker';
 
 export class Helpers {
+  async getDigits(selector: Locator) {
+    return Number(((await selector.textContent()) ?? '').match(/\d+.\d+|\d+/));
+  }
+
   async generateRandomNumber(min: number, max: number): Promise<number> {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -11,7 +16,8 @@ export class Helpers {
   }
 
   async completeSuccessfulPurchase(
-    productNumber: number & { max: 6 },
+    productNumber: number,
+    entireFlow: boolean,
     page: Page,
     firstName?: string,
     lastName?: string,
@@ -21,17 +27,34 @@ export class Helpers {
     const cart = new Cart(page);
     const yourInfo = new YourInfo(page);
     const overview = new Overview(page);
-    const addButtons = page.$$(products.addItemtoCart.toString());
-    for (let i = 0; i < productNumber; i++) {
-      await addButtons[i].click();
+    const completion = new Completion(page);
+    for (const i of [
+      products.GenericInventory().addItem1,
+      products.GenericInventory().addItem2,
+      products.GenericInventory().addItem3,
+      products.GenericInventory().addItem4,
+      products.GenericInventory().addItem5,
+      products.GenericInventory().addItem6,
+    ]) {
+      await i.click();
     }
-    await expect(products.shoppingCartItemCounter).toHaveText(String(productNumber));
-    await products.shoppingCartLink.click();
-    await expect(cart.header).toHaveText('Your Cart', { ignoreCase: true });
+    await expect(products.GenericInventory().shoppingCartItemCounter).toHaveText(String(productNumber));
+    await products.GenericInventory().shoppingCartLink.click();
+    await expect(cart.GenericInventory().header).toHaveText('Your Cart', { ignoreCase: true });
     await expect(cart.GenericInventory().listItem).toHaveCount(productNumber);
     await cart.checkoutButton.click();
-    await yourInfo.firstNameInput.fill(firstName ?? '');
-    await yourInfo.lastNameInput.fill(lastName ?? '');
+    await expect(yourInfo.GenericInventory().header).toHaveText('Checkout: Your Information', { ignoreCase: true });
+    await yourInfo.firstNameInput.fill(firstName || faker.person.firstName());
+    await yourInfo.lastNameInput.fill(lastName || faker.person.lastName());
+    await yourInfo.postcodeInput.fill(postcode || faker.location.zipCode('{{postcode}}'));
+    await yourInfo.continueButton.click();
+    await expect(overview.GenericInventory().header).toHaveText('Checkout: Overview', { ignoreCase: true });
+    if (entireFlow === true) {
+      await expect(overview.GenericInventory().listItem).toHaveCount(productNumber);
+      await overview.finishButton.click();
+    } else {
+      await expect(overview.total).toBeVisible();
+    }
   }
 }
 
