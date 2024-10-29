@@ -13,7 +13,7 @@ export class YourInfo {
     this.firstNameInput = page.locator('//*[@data-test="firstName"]');
     this.lastNameInput = page.locator('//*[@data-test="lastName"]');
     this.postcodeInput = page.locator('//*[@data-test="postalCode"]');
-    this.continueButton = page.locator('//*[@data-test="continue"]');
+    this.continueButton = page.getByRole('button', { name: 'CONTINUE' });
   }
 
   GenericInventory() {
@@ -30,10 +30,10 @@ export class Overview {
 
   constructor(page: Page) {
     this.page = page;
-    this.subtotal = page.locator('//*[@data-test="subtotal-label"]');
-    this.tax = page.locator('//*[@data-test="tax-label"]');
-    this.total = page.locator('//*[@data-test="total-label"]');
-    this.finishButton = page.locator('//*[@data-test="finish"]');
+    this.subtotal = page.locator('//*[@class="summary_subtotal_label"]');
+    this.tax = page.locator('//*[@class="summary_tax_label"]');
+    this.total = page.locator('//*[@class="summary_total_label"]');
+    this.finishButton = page.getByRole('link', { name: 'FINISH' });
   }
   GenericInventory() {
     return new GenericInventory(this.page);
@@ -46,7 +46,7 @@ export class Completion {
 
   constructor(page: Page) {
     this.page = page;
-    this.checkoutComplete = page.locator('//*[@data-test="checkout-complete-container"]');
+    this.checkoutComplete = page.locator('//*[@id="checkout_complete_container"]');
   }
   GenericInventory() {
     return new GenericInventory(this.page);
