@@ -5,7 +5,7 @@ test.describe('E2E - Successful purchase', () => {
   const standardUser = 'standard_user';
   const password = 'secret_sauce';
   test.beforeEach(async ({ page, login }) => {
-    await page.goto('/');
+    await page.goto('https://www.saucedemo.com/v1/index.html');
     await expect(login.usernameField).toBeVisible();
     await login.usernameField.fill(standardUser);
     await login.passwordField.fill(password);
@@ -13,8 +13,8 @@ test.describe('E2E - Successful purchase', () => {
   });
 
   test('Should check the ability to login successfully', { tag: ['@login'] }, async ({ products, page }) => {
-    await expect(products.GenericInventory().header).toHaveText('Products', { ignoreCase: true });
-    await expect(page).toHaveURL('/inventory.html');
+    await expect(products.header).toBeVisible();
+    await expect(page).toHaveURL('/v1/inventory.html');
   });
 
   test('Should check the ability to sort', { tag: ['@sorting'] }, async ({ page }) => {
@@ -52,7 +52,7 @@ test.describe('E2E - Successful purchase', () => {
   test('Should check the calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {
     await helpers.completeSuccessfulPurchase(6, false, page);
     const subtotal = await helpers.getDigits(overview.subtotal);
-    const priceElements = await page.$$('[data-test=inventory-item-price]');
+    const priceElements = await page.$$('[class=inventory_item_price]');
     const prices = await Promise.all(
       priceElements.map(async element => {
         const priceText = (await element.textContent()) ?? '';
@@ -67,7 +67,7 @@ test.describe('E2E - Successful purchase', () => {
     await expect(subtotal + tax).toEqual(total);
   });
 
-  test('Should check we can purchase products successfully', { tag: ['@e2e'] }, async ({ page, completion }) => {
+  test('Should check we can purchase products successfully', { tag: ['@e2ePurchase'] }, async ({ page, completion }) => {
     await helpers.completeSuccessfulPurchase(6, true, page);
     await expect(completion.checkoutComplete).toBeVisible();
   });

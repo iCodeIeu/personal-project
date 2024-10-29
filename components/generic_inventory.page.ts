@@ -23,24 +23,51 @@ class GenericInventory {
 
   constructor(page: Page) {
     this.page = page;
-    this.header = page.locator('//*[@data-test="title"]');
-    this.listItem = page.locator('//*[@data-test="inventory-item"]');
-    this.listItemName = page.locator('//*[@data-test="inventory-item-name"]');
-    this.listItemPrice = page.locator('//*[@data-test="inventory-item-price"]');
-    this.shoppingCartLink = page.locator('//*[@data-test="shopping-cart-link"]');
-    this.shoppingCartItemCounter = page.locator('//*[@data-test="shopping-cart-badge"]');
-    this.addItem1 = page.locator('[data-test="add-to-cart-sauce-labs-backpack"]');
-    this.addItem2 = page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]');
-    this.addItem3 = page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]');
-    this.addItem4 = page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]');
-    this.addItem5 = page.locator('[data-test="add-to-cart-sauce-labs-onesie"]');
-    this.addItem6 = page.locator('[data-test="add-to-cart-test\\.allthethings\\(\\)-t-shirt-\\(red\\)"]');
-    this.removeItem1 = page.locator('[data-test="remove-sauce-labs-backpack"]');
-    this.removeItem2 = page.locator('[data-test="remove-sauce-labs-bike-light"]');
-    this.removeItem3 = page.locator('[data-test="remove-sauce-labs-bolt-t-shirt"]');
-    this.removeItem4 = page.locator('[data-test="remove-sauce-labs-fleece-jacket"]');
-    this.removeItem5 = page.locator('[data-test="remove-sauce-labs-onesie"]');
-    this.removeItem6 = page.locator('[data-test="remove-test\\.allthethings\\(\\)-t-shirt-\\(red\\)"]');
+    this.header = page.locator('//*[@class="subheader"]');
+    this.listItem = page.locator('//*[@class="inventory_item"]');
+    this.listItemName = page.locator('//*[@class="inventory_item_name"]');
+    this.listItemPrice = page.locator('//*[@class="inventory_item_price"]');
+    this.shoppingCartLink = page.locator('//*[@id="shopping_cart_container"]//a');
+    this.shoppingCartItemCounter = page.locator('//*[@class="fa-layers-counter shopping_cart_badge"]');
+    this.addItem1 = page
+      .locator('div')
+      .filter({ hasText: /^\$29\.99ADD TO CART$/ })
+      .getByRole('button');
+    this.addItem2 = page
+      .locator('div')
+      .filter({ hasText: /^\$9\.99ADD TO CART$/ })
+      .getByRole('button');
+    this.addItem3 = page.getByRole('button', { name: 'ADD TO CART' }).first();
+    this.addItem4 = page
+      .locator('div')
+      .filter({ hasText: /^\$49\.99ADD TO CART$/ })
+      .getByRole('button');
+    this.addItem5 = page
+      .locator('div')
+      .filter({ hasText: /^\$7\.99ADD TO CART$/ })
+      .getByRole('button');
+    this.addItem6 = page.getByRole('button', { name: 'ADD TO CART' });
+    this.removeItem1 = page
+      .locator('div')
+      .filter({ hasText: /^\$29\.99REMOVE$/ })
+      .getByRole('button');
+    this.removeItem2 = page
+      .locator('div')
+      .filter({ hasText: /^\$9\.99REMOVE$/ })
+      .getByRole('button');
+    this.removeItem3 = page.getByRole('button', { name: 'REMOVE' }).first();
+    this.removeItem4 = page
+      .locator('div')
+      .filter({ hasText: /^\$49\.99REMOVE$/ })
+      .getByRole('button');
+    this.removeItem5 = page
+      .locator('div')
+      .filter({ hasText: /^\$7\.99REMOVE$/ })
+      .getByRole('button');
+    this.removeItem6 = page
+      .locator('div')
+      .filter({ hasText: /^\$15\.99REMOVE$/ })
+      .getByRole('button');
   }
 }
 

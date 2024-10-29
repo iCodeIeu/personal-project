@@ -7,7 +7,7 @@ export class Cart {
 
   constructor(page: Page) {
     this.page = page;
-    this.checkoutButton = page.locator('//*[@data-test="checkout"]');
+    this.checkoutButton = page.getByRole('link', { name: 'CHECKOUT' });
   }
 
   GenericInventory() {
