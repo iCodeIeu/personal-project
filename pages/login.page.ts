@@ -14,10 +14,7 @@ export class Login {
     this.page = page;
     this.saucelabsLogo = page.getByRole('img');
     this.usernameField = page.locator('//*[@data-test="username"]');
-    // this.usernameError = this.usernameField.locator(this.sharedError);
     this.passwordField = page.locator('//*[@data-test="password"]');
-    this.passwordError = this.passwordField.locator('/following-sibling::h3[@data-test="error"]');
-    // this.sharedError = page.locator('/following-sibling::h3[@data-test="error"]');
     this.loginButton = page.getByRole('button', { name: 'LOGIN' });
   }
 }
