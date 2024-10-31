@@ -4,7 +4,24 @@ import { Cart } from './cart.page';
 import { YourInfo, Overview } from './checkout.page';
 import { faker } from '@faker-js/faker';
 
+export type UserRoles = 'standard_user' | 'problem_user' | 'performance_glitch_user' | 'locked_out_user';
+
+const testUserPassword = 'secret_sauce';
+
 export class Helpers {
+  async manualLogin(page: Page, userName: string, targetSuffix?: string, userNameOverride?: string, passwordOverride?: string) {
+    const u = userNameOverride || userName;
+    const p = passwordOverride || testUserPassword;
+    await page.locator('//*[@data-test="username"]').fill(u);
+    await page.locator('//*[@data-test="password"]').fill(p);
+    await page.getByRole('button', { name: 'LOGIN' }).click();
+    await page.waitForLoadState('load');
+    if (targetSuffix) {
+      await page.goto(targetSuffix);
+      await page.waitForLoadState('load');
+    }
+  }
+
   async getDigits(selector: Locator) {
     return Number(((await selector.textContent()) ?? '').match(/\d+.\d+|\d+/));
   }

@@ -1,15 +1,13 @@
 import { test, expect } from '../../fixtures/fixtures';
-import helpers, { testSorting } from '../../pages/helpers.page';
+import helpers, { testSorting, UserRoles } from '../../pages/helpers.page';
 
 test.describe('E2E - Successful purchase', () => {
-  const standardUser = 'standard_user';
-  const password = 'secret_sauce';
+  const role: UserRoles = 'standard_user';
+
   test.beforeEach(async ({ page, login }) => {
-    await page.goto('https://www.saucedemo.com/v1/index.html');
+    await page.goto('/v1/index.html');
     await expect(login.usernameField).toBeVisible();
-    await login.usernameField.fill(standardUser);
-    await login.passwordField.fill(password);
-    await login.loginButton.click();
+    await helpers.manualLogin(page, role);
   });
 
   test('Should check the ability to login successfully', { tag: ['@login'] }, async ({ products, page }) => {
