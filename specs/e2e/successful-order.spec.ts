@@ -15,7 +15,7 @@ test.describe('E2E - Successful purchase', () => {
     await expect(page).toHaveURL('/v1/inventory.html');
   });
 
-  test('Should check the ability to sort', { tag: ['@sorting'] }, async ({ page }) => {
+  test('Should check the ability to sort products', { tag: ['@sorting'] }, async ({ page }) => {
     const productOptions = ['az', 'za', 'hilo', 'lohi'];
     const randomNumber = await helpers.generateRandomNumber(0, 3);
     await testSorting(page, productOptions[randomNumber]);
@@ -47,7 +47,7 @@ test.describe('E2E - Successful purchase', () => {
     await expect(products.GenericInventory().shoppingCartItemCounter).toBeHidden();
   });
 
-  test('Should check the calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {
+  test('Should check the checkout calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {
     await helpers.completeSuccessfulPurchase(6, false, page);
     const subtotal = await helpers.getDigits(overview.subtotal);
     const priceElements = await page.$$('[class=inventory_item_price]');
