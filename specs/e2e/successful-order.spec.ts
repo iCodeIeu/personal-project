@@ -16,8 +16,8 @@ test.describe('E2E - Successful purchase', () => {
   });
 
   test('Should check the ability to sort products', { tag: ['@sorting'] }, async ({ page }) => {
-    const productOptions: string[] = ['az', 'za', 'hilo', 'lohi'];
-    const randomNumber: number = await helpers.generateRandomNumber(0, 3);
+    const productOptions = ['az', 'za', 'hilo', 'lohi'];
+    const randomNumber = await helpers.generateRandomNumber(0, 3);
     await testSorting(page, productOptions[randomNumber]);
   });
 
@@ -49,19 +49,19 @@ test.describe('E2E - Successful purchase', () => {
 
   test('Should check the checkout calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {
     await helpers.completeSuccessfulPurchase(6, false, page);
-    const subtotal: number = await helpers.getDigits(overview.subtotal);
+    const subtotal = await helpers.getDigits(overview.subtotal);
     const priceElements = await page.$$('[class=inventory_item_price]');
-    const prices: number[] = await Promise.all(
+    const prices = await Promise.all(
       priceElements.map(async element => {
-        const priceText: string = (await element.textContent()) ?? '';
+        const priceText = (await element.textContent()) ?? '';
         return parseFloat(priceText.replace('$', ''));
       })
     );
-    const arrayTotal: number = prices.reduce((acc, price) => acc + price, 0);
+    const arrayTotal = prices.reduce((acc, price) => acc + price, 0);
     await expect(arrayTotal).toEqual(subtotal);
 
-    const tax: number = await helpers.getDigits(overview.tax);
-    const total: number = await helpers.getDigits(overview.total);
+    const tax = await helpers.getDigits(overview.tax);
+    const total = await helpers.getDigits(overview.total);
     await expect(subtotal + tax).toEqual(total);
   });
 
