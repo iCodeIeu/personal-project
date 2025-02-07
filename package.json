@@ -14,7 +14,10 @@
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^9.1.0",
-    "@playwright/test": "^1.47.0",
+    "@playwright/test": "^1.50.1",
     "@types/node": "^22.5.4"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.10.1"
   }
 }
