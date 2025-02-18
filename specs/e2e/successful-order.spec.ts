@@ -1,13 +1,9 @@
 import { test, expect } from '../../fixtures/fixtures';
-import helpers, { testSorting, UserRoles } from '../../pages/helpers.page';
+import helpers, { testSorting } from '../../pages/helpers.page';
 
 test.describe('E2E - Successful purchase', () => {
-  const role: UserRoles = 'standard_user';
-
-  test.beforeEach(async ({ page, login }) => {
-    await page.goto('/v1/index.html');
-    await expect(login.usernameField).toBeVisible();
-    await helpers.manualLogin(page, role);
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/inventory.html');
   });
 
   test('Should check the ability to login successfully', { tag: ['@login'] }, async ({ products, page }) => {
