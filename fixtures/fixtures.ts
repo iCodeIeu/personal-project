@@ -4,9 +4,9 @@ import { Products } from '../pages/products.page';
 import { Cart } from '../pages/cart.page';
 import { YourInfo, Overview, Completion } from '../pages/checkout.page';
 
-type Fixtures = {
+interface Fixtures {
   login: Login;
-  products: Products;
+  products: (profileId: string) => Products;
   cart: Cart;
   yourInfo: YourInfo;
   overview: Overview;
@@ -20,7 +20,7 @@ export const test = base.extend<Fixtures>({
   },
 
   products: async ({ page }, use) => {
-    const products = new Products(page);
+    const products = (profileId: string) => new Products(page, profileId);
     await use(products);
   },
 
