@@ -9,8 +9,7 @@ export class Products {
   readonly addItemtoCart: Locator;
   readonly removeItemFromCart: Locator;
 
-  constructor(page: Page, profileId: string) {
-    this.profileId = profileId;
+  constructor(page: Page) {
     this.page = page;
     this.header = page.getByText('Products');
     this.sortByDropdown = page.getByRole('combobox');

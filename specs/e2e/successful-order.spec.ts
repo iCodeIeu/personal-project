@@ -11,10 +11,7 @@ test.describe('E2E - Successful purchase', () => {
   });
 
   test('Should check the ability to login successfully', { tag: ['@login'] }, async ({ products, page }) => {
-    const someProfileId = 'std1'
-    const productsPage = products(someProfileId);
-    productsPage.logProfileId();
-    await expect(productsPage.header).toBeVisible();
+    await expect(products.header).toBeVisible();
     await expect(page).toHaveURL('/v1/inventory.html');
   });
 
@@ -25,32 +22,29 @@ test.describe('E2E - Successful purchase', () => {
   });
 
   test('Should check the ability to add/remove products', { tag: ['@addRemove'] }, async ({ products }) => {
-    const someProfileId = 'std2'
-    const productsPage = products(someProfileId);
-    productsPage.logProfileId();
     for (const i of [
-      productsPage.GenericInventory().addItem1,
-      productsPage.GenericInventory().addItem2,
-      productsPage.GenericInventory().addItem3,
-      productsPage.GenericInventory().addItem4,
-      productsPage.GenericInventory().addItem5,
-      productsPage.GenericInventory().addItem6,
+      products.GenericInventory().addItem1,
+      products.GenericInventory().addItem2,
+      products.GenericInventory().addItem3,
+      products.GenericInventory().addItem4,
+      products.GenericInventory().addItem5,
+      products.GenericInventory().addItem6,
     ]) {
       await i.click();
     }
-    await expect(productsPage.GenericInventory().shoppingCartItemCounter).toHaveText('6');
+    await expect(products.GenericInventory().shoppingCartItemCounter).toHaveText('6');
 
     for (const i of [
-      productsPage.GenericInventory().removeItem1,
-      productsPage.GenericInventory().removeItem2,
-      productsPage.GenericInventory().removeItem3,
-      productsPage.GenericInventory().removeItem4,
-      productsPage.GenericInventory().removeItem5,
-      productsPage.GenericInventory().removeItem6,
+      products.GenericInventory().removeItem1,
+      products.GenericInventory().removeItem2,
+      products.GenericInventory().removeItem3,
+      products.GenericInventory().removeItem4,
+      products.GenericInventory().removeItem5,
+      products.GenericInventory().removeItem6,
     ]) {
       await i.click();
     }
-    await expect(productsPage.GenericInventory().shoppingCartItemCounter).toBeHidden();
+    await expect(products.GenericInventory().shoppingCartItemCounter).toBeHidden();
   });
 
   test('Should check the checkout calculations are correct', { tag: ['@calculations'] }, async ({ page, overview }) => {

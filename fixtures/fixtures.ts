@@ -6,7 +6,7 @@ import { YourInfo, Overview, Completion } from '../pages/checkout.page';
 
 interface Fixtures {
   login: Login;
-  products: (profileId: string) => Products;
+  products: Products;
   cart: Cart;
   yourInfo: YourInfo;
   overview: Overview;
@@ -20,7 +20,7 @@ export const test = base.extend<Fixtures>({
   },
 
   products: async ({ page }, use) => {
-    const products = (profileId: string) => new Products(page, profileId);
+    const products = new Products(page);
     await use(products);
   },
 
