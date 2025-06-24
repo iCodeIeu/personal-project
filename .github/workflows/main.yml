@@ -68,26 +68,16 @@ jobs:
         with:
           pattern: blob-report-*
           path: all-blob-reports
-          merge-multiple: true
-
-      - name: Extract blob reports
-        run: |
-          cd all-blob-reports
-          for zipfile in report-*.zip; do
-            unzip -o "$zipfile" -d "report-$(basename "$zipfile" .zip)"
-          done
-
+          merge-multiple: false
+      
       - name: Debug directory structure
         run: |
           ls -R all-blob-reports
-          echo "Current directory:"
-          pwd
-          echo "Contents of all-blob-reports:"
-          find all-blob-reports -type f
-
+          find all-blob-reports -type d -name "blob-report"
+      
       - name: Merge into HTML Report
         run: |
-          npx playwright merge-reports --reporter html ./all-blob-reports/report-*/blob-report
+          npx playwright merge-reports --reporter html all-blob-reports/blob-report-*/blob-report
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
