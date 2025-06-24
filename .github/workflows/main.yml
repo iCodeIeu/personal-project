@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ['1-2', '2-2']  # Changed to 2 shards instead of 3
+        shard: [1/3, 2/3, 3/3]  # Changed to 2 shards instead of 3
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,6 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test specs/e2e/ --shard ${{ matrix.shard }} --workers=2 --reporter=blob
-        # Updated path to specs/e2e/ and reduced workers since there are fewer tests
 
       - name: Upload blob report
         if: always()
