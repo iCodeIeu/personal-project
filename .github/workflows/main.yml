@@ -35,13 +35,14 @@ jobs:
         run: npx playwright test specs/e2e/ --shard ${{ matrix.shard }} --workers=2 --reporter=blob
 
       - name: Prepare blob report name
-        run: echo "blob-report-${{ matrix.shard }}" | sed 's/\//-/g' > report-name.txt
+        id: prep
+        run: echo "name=blob-report-$(echo '${{ matrix.shard }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
       
       - name: Upload blob report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: $(cat report-name.txt)
+          name: ${{ steps.prep.outputs.name }}
           path: blob-report
           retention-days: 30
 
