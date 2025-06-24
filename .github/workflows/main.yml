@@ -7,16 +7,11 @@ on:
     branches: [main, master]
 
 jobs:
-  test:
-    name: 'Playwright Tests - Shard ${{ matrix.shard }}'
-    timeout-minutes: 60
+  install-playwright:
+    name: Install Playwright Browsers
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1/3, 2/3, 3/3]  # Changed to 2 shards instead of 3
-
+    outputs:
+      playwright-path: ${{ steps.install.outputs.playwright-path }} # Output the path to Playwright
     steps:
       - uses: actions/checkout@v4
 
@@ -29,7 +24,47 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        id: install
+        run: |
+          npm i playwright # Install Playwright locally
+          npx playwright install --with-deps
+          echo "playwright-path=$(npm root)/playwright" >> $GITHUB_OUTPUT # Output the path
+      
+      - name: Upload Playwright installation
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-installation
+          path: node_modules/playwright # Upload the playwright installation directory
+          retention-days: 1
+
+
+  test:
+    name: 'Playwright Tests - Shard ${{ matrix.shard }}'
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: [install-playwright] # This job depends on playwright installation
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/3, 2/3, 3/3] # You mentioned 2 shards, but matrix still shows 3. Adjust as needed.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Download Playwright installation
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-installation
+          path: node_modules/playwright # Download to the correct location
 
       - name: Run Playwright tests
         run: npx playwright test specs/e2e/ --shard ${{ matrix.shard }} --workers=2 --reporter=blob
